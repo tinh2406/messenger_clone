@@ -1,9 +1,9 @@
-import getCurrentUser from "./getCurrentUser";
-
+import prisma from "../libs/prismadb";
+import getSession from "./getSession";
 export default async () => {
-  const user = await getCurrentUser();
+  const session = await getSession();
 
-  if (!user?.id) {
+  if (!session?.user?.id) {
     return [];
   }
 
@@ -14,7 +14,7 @@ export default async () => {
       },
       where: {
         userIds: {
-          has: user.id,
+          has: session.user.id,
         },
         NOT: {
           lastMessageAt: null,

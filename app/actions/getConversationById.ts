@@ -1,6 +1,5 @@
 import { MySession } from "../types";
-import getSession from "./getSession";
-
+import prisma from "../libs/prismadb";
 export default async (conversationId: string, session: MySession) => {
   if (!session?.user?.id) return null;
 
