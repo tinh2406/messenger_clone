@@ -16,12 +16,12 @@ interface BodyProps {
 
 export default ({ initialMessages }: BodyProps) => {
   const session = useSession();
-  const [messages, setMessages] = useState(initialMessages.reverse());
+  const [messages, setMessages] = useState(initialMessages);
   const bottomRef = useRef<HTMLDivElement>(null);
   const { conversationId } = useConversation();
-  // useEffect(() => {
-  //     axios.post(`/api/conversations/${conversationId}/seen`);
-  //   }, [conversationId]);
+  useEffect(() => {
+    axios.post(`/api/conversations/${conversationId}/seen`);
+  }, [conversationId]);
   useEffect(() => {
     //     pusherClient.subscribe(conversationId);
     bottomRef.current?.scrollIntoView({

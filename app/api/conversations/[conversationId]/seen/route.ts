@@ -21,25 +21,17 @@ export async function POST(req: Request, { params }: { params: IParams }) {
           hasSome: [currentUser.id],
         },
       },
-      include: {
-        messages: {
-          take: 1,
-          orderBy: {
-            createdAt: "desc",
-          },
-        },
-      },
     });
     if (!conversation) {
       return new NextResponse("Conversation not found", { status: 404 });
     }
-    const lastMessage = conversation.messages[0];
-    if (!lastMessage) {
+    
+    if (!conversation.lastMessageId) {
       return NextResponse.json(conversation);
     }
     const updatedMessage = await prisma?.message.update({
       where: {
-        id: lastMessage.id,
+        id: conversation.lastMessageId,
       },
       data: {
         seenIds: {
