@@ -3,11 +3,11 @@
 import { FullMessageType } from "@/app/types";
 import clsx from "clsx";
 import { format } from "date-fns";
-import { useSession } from "next-auth/react";
 import Image from "next/image";
 import { memo, useState } from "react";
 import Avatar from "@/app/components/Avatar";
 import ImageModal from "./ImageModal";
+import { useAuth } from "@/app/context/AuthContext";
 
 interface MessageBoxProps {
   isLast?: boolean;
@@ -15,12 +15,12 @@ interface MessageBoxProps {
 }
 
 export default memo(({ data, isLast }: MessageBoxProps) => {
-  const session = useSession();
+  const session = useAuth();
 
   const [imageModalOpen, setImageModalOpen] = useState(false);
 
   const isOwn = session.data?.user?.email === data.sender.email;
-
+  
   const seenList = (data.seen || [])
     .filter((user) => user.email !== data.sender.email)
     .map((user) => user.name)

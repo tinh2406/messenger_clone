@@ -7,15 +7,15 @@ import axios from "axios";
 // import { pusherClient } from "@/app/libs/pusher";
 import { find } from "lodash";
 import MessageBox from "./MessageBox";
-import { useSession } from "next-auth/react";
 import CircleLoading from "@/app/components/CircleLoading";
+import { useAuth } from "@/app/context/AuthContext";
 
 interface BodyProps {
   initialMessages: FullMessageType[];
 }
 
 export default ({ initialMessages }: BodyProps) => {
-  const session = useSession();
+  const session = useAuth()
   const [messages, setMessages] = useState(initialMessages);
   const bottomRef = useRef<HTMLDivElement>(null);
   const { conversationId } = useConversation();

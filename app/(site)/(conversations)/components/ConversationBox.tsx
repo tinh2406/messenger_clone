@@ -64,7 +64,7 @@ export default ({ data, userEmail }: ConversationBoxProps) => {
       ) : (
         otherUser && <Avatar user={otherUser} />
       )}
-      <div className="hidden md:flex min-w-0 flex-1">
+      <div className="flex min-w-0 flex-1">
         <div className="focus:outline-none w-full">
           <div className="flex justify-between items-center mb-1">
             <p className="text-md font-semibold text-gray-900">

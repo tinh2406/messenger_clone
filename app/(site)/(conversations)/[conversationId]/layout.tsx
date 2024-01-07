@@ -32,7 +32,7 @@ export default async ({
     );
   }
   return (
-    <div className="pl-24 md:pl-80 h-full pb-0 md:pb-14 lg:pb-0">
+    <div className="bg-white absolute w-full left-0 h-full pb-0 md:relative md:w-auto md:ml-80 md:pb-14 lg:pb-0">
       <div className="h-full flex flex-col">
         <Header
           conversation={conversation!}

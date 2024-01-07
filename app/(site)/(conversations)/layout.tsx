@@ -3,7 +3,6 @@ import ConversationList from "./components/ConversationList";
 import { Suspense } from "react";
 import { MdOutlineGroupAdd } from "react-icons/md";
 import GroupChatModal from "./components/GroupChatWrapper";
-import Image from "next/image";
 import Loading from "@/app/components/Loading";
 
 export default ({ children }: { children: React.ReactNode }) => {
@@ -18,24 +17,17 @@ export default ({ children }: { children: React.ReactNode }) => {
             pb-14
             lg:pb-0
             lg:left-20
+            w-full
             md:w-80
-            md:block
+            block
             overflow-y-auto
             border-r
             border-gray-200
-            w-24
             `
         )}
       >
-        <div className="px-1 md:px-5">
-          <Image
-            alt="Logo"
-            height={48}
-            width={48}
-            className="mx-auto w-auto md:hidden pt-4 mb-[4px]"
-            src="https://github.com/tinh2406/messenger-clone-nextjs13/blob/main/public/images/logo.png?raw=true"
-          />
-          <div className="hidden md:flex justify-between mb-[12px] pt-4">
+        <div className="px-5">
+          <div className="flex justify-between mb-[12px] pt-4">
             <div className="text-2xl font-bold text-neutral-800">Message</div>
             <Suspense
               fallback={

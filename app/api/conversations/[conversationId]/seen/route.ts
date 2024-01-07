@@ -21,14 +21,19 @@ export async function POST(req: Request, { params }: { params: IParams }) {
           hasSome: [currentUser.id],
         },
       },
+      include: {
+        lastMessage: true,
+      },
     });
     if (!conversation) {
       return new NextResponse("Conversation not found", { status: 404 });
     }
-    
     if (!conversation.lastMessageId) {
       return NextResponse.json(conversation);
     }
+    if (conversation.lastMessage?.seenIds.includes(currentUser.id))
+      return NextResponse.json(conversation);
+
     const updatedMessage = await prisma?.message.update({
       where: {
         id: conversation.lastMessageId,
