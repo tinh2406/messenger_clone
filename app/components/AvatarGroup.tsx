@@ -12,7 +12,7 @@ export default ({ users }: AvatarGroupProps) => {
   const slicedUsers = users?.slice(0, 3);
 
   return (
-    <div className="relative h-11 w-11">
+    <div className="mx-auto relative h-11 w-11">
       {slicedUsers?.map((user, i) => (
         <div
           key={user.name}

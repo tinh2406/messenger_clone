@@ -1,13 +1,17 @@
-import UserBox from "./UserBox"
+import { Suspense } from "react";
+import UserBox from "./UserBox";
 import getUsers from "@/app/actions/getUsers";
+import Loading from "@/app/components/Loading";
 
-
-export default async() => {
+const UserList = async () => {
   const users = await getUsers();
+  return users.map((user) => <UserBox key={user.id} data={user} />);
+};
 
-    return (
-        <aside
-            className="
+export default () => {
+  return (
+    <aside
+      className="
             bg-white
             fixed
             inset-y-0
@@ -22,24 +26,23 @@ export default async() => {
             block
             w-full
             left-0"
-        >
-            <div className="px-5">
-                <div className="flex-col">
-                    <div className="
+    >
+      <div className="px-5">
+        <div className="flex-col">
+          <div
+            className="
                     text-2xl 
                     font-bold
                     text-neutral-800 
-                    py-4">
-                        People
-                    </div>
-                </div>
-                {users.map((user => (
-                    <UserBox
-                        key={user.id}
-                        data={user}
-                    />
-                )))}
-            </div>
-        </aside>
-    )
-}
+                    py-4"
+          >
+            People
+          </div>
+          <Suspense fallback={<Loading/>}>
+            <UserList/>
+          </Suspense>
+        </div>
+      </div>
+    </aside>
+  );
+};

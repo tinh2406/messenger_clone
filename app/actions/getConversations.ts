@@ -22,11 +22,7 @@ export default async () => {
       },
       include: {
         users: true,
-        messages: {
-          take: 1,
-          orderBy: {
-            createdAt: "desc",
-          },
+        lastMessage: {
           include: {
             sender: true,
             seen: true,
@@ -34,7 +30,6 @@ export default async () => {
         },
       },
     });
-
     return conversations;
   } catch (error) {
     return [];

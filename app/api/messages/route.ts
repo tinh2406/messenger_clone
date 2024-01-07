@@ -25,9 +25,7 @@ export async function POST(req: Request) {
       where: { id: conversationId },
       data: {
         lastMessageAt: new Date(),
-        messageIds: {
-          push: newMessage?.id,
-        },
+        lastMessageId: newMessage?.id,
       },
       include: {
         users: true,
@@ -39,5 +37,7 @@ export async function POST(req: Request) {
       },
     });
     return NextResponse.json(newMessage);
-  } catch (error) {}
+  } catch (error) {
+    return new NextResponse("Internal server error: ", { status: 500 });
+  }
 }

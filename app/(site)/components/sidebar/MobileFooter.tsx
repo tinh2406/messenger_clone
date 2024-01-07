@@ -24,7 +24,7 @@ export default () => {
             border-t-[1px]
             lg:hidden
         `,
-        isOpen && "hidden"
+        isOpen && "hidden md:flex"
       )}
     >
       {routes.map((route) => (

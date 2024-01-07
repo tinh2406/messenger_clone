@@ -5,6 +5,12 @@ export type FullMessageType = Message & {
   sender: User;
   seen: User[];
 };
+
+export type ConversationType = Conversation&{
+  users:User[],
+  lastMessage?:FullMessageType|null
+}
+
 export type FullConversationType = Conversation & {
   users: User[];
   messages: FullMessageType[];
