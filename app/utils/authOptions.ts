@@ -18,7 +18,6 @@ export const authOptions: AuthOptions = {
         password: { label: "password", type: "password" },
       },
       async authorize(credentials) {
-        console.log("User:::credentials", credentials);
         if (!credentials?.email || !credentials?.password) {
           throw new Error("Invalid credentials");
         }
@@ -27,8 +26,11 @@ export const authOptions: AuthOptions = {
             where: {
               email: credentials.email,
             },
+            cacheStrategy: {
+              swr: 60,
+              ttl: 60,
+            },
           });
-          console.log("User:::", user);
           if (!user || !user?.hashedPassword) {
             throw new Error("Invalid credentials");
           }
