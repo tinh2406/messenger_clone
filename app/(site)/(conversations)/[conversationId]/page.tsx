@@ -9,9 +9,8 @@ interface IParams {
 }
 
 export default async ({
-  params,
+  params
 }: {
-  children: React.ReactNode;
   params: IParams;
 }) => {
   return (
