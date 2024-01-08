@@ -1,14 +1,14 @@
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import { AuthOptions } from "next-auth";
-// import prisma from "../libs/prismadb";
+import prisma from "../libs/prismadb";
 import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 import { MySession } from "@/app/types";
-import { PrismaClient } from "@prisma/client";
 
-const prisma = new PrismaClient();
+// const prisma = new PrismaClient();
 
 export const authOptions: AuthOptions = {
+  //@ts-ignore
   adapter: PrismaAdapter(prisma),
   providers: [
     CredentialsProvider({
