@@ -1,14 +1,15 @@
-import getCurrentUser from "@/app/actions/getCurrentUser";
 import getSession from "@/app/actions/getSession";
 import { NextResponse } from "next/server";
 import { parse } from "url";
+import prisma from "../../libs/prismadb";
+
 export async function POST(req: Request) {
   try {
-    const currentUser = await getCurrentUser();
+    const session = await getSession();
 
     const body = await req.json();
     const { userId, isGroup, members, name } = body;
-    if (!currentUser?.id || !currentUser.email) {
+    if (!session?.user?.id || !session.user.email) {
       return new NextResponse("Unauthorized", { status: 401 });
     }
     if (isGroup && (!members || members.length < 2 || !name)) {
@@ -19,20 +20,15 @@ export async function POST(req: Request) {
         data: {
           name,
           isGroup,
-          lastMessageAt:new Date(),
-          users: {
-            connect: [
-              ...members.map((member: { value: string }) => ({
-                id: member.value,
-              })),
-              {
-                id: currentUser.id,
-              },
-            ],
-          },
-        },
-        include: {
-          users: true,
+          lastMessageAt: new Date(),
+          userIds: [
+            ...members.map((member: { value: string }) => ({
+              id: member.value,
+            })),
+            {
+              id: session.user.id,
+            },
+          ],
         },
       });
       return NextResponse.json(newConversation);
@@ -42,15 +38,19 @@ export async function POST(req: Request) {
         OR: [
           {
             userIds: {
-              equals: [currentUser.id, userId],
+              equals: [session.user.id, userId],
             },
           },
           {
             userIds: {
-              equals: [userId, currentUser.id],
+              equals: [userId, session.user.id],
             },
           },
         ],
+      },
+      cacheStrategy: {
+        swr: 60,
+        ttl: 60,
       },
     });
     if (existingConversation) {
@@ -58,10 +58,10 @@ export async function POST(req: Request) {
     }
     const newConversation = await prisma?.conversation.create({
       data: {
-        userIds: [userId, currentUser.id],
+        userIds: [userId, session.user.id],
         isGroup: false,
       },
-    })
+    });
     return NextResponse.json(newConversation);
   } catch (error) {
     return new NextResponse("Internal Error", { status: 500 });
@@ -92,6 +92,10 @@ export async function GET(req: Request) {
             lastMessageAt: null,
           },
         },
+        cacheStrategy: {
+          swr: 60,
+          ttl: 60,
+        },
       })) || 1) - 1;
     const conversations = await prisma?.conversation.findMany({
       orderBy: {
@@ -115,6 +119,10 @@ export async function GET(req: Request) {
             seen: true,
           },
         },
+      },
+      cacheStrategy: {
+        swr: 60,
+        ttl: 60,
       },
     });
     return NextResponse.json({

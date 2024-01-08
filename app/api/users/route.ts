@@ -1,7 +1,7 @@
 import getSession from "@/app/actions/getSession";
 import { NextResponse } from "next/server";
 import { parse } from "url";
-
+import prisma from "../../libs/prismadb"
 interface GetUsersQuery {
   skip?: number;
   take?: number;

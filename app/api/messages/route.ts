@@ -1,20 +1,21 @@
-import getCurrentUser from "@/app/actions/getCurrentUser";
 import { NextResponse } from "next/server";
-// import prisma from "../../libs/prismadb";
+import prisma from "../../libs/prismadb";
+import getSession from "@/app/actions/getSession";
+
 export async function POST(req: Request) {
   try {
-    const currentUser = await getCurrentUser();
+    const session = await getSession();
     const body = await req.json();
     const { message, image, conversationId } = body;
-    if (!currentUser?.id || !currentUser.email)
+    if (!session?.user?.id || !session.user.email)
       throw new NextResponse("Unauthorized", { status: 401 });
     const newMessage = await prisma?.message.create({
       data: {
         body: message,
         image,
         conversationId,
-        senderId: currentUser.id,
-        seenIds: [currentUser.id],
+        senderId: session.user.id,
+        seenIds: [session.user.id],
       },
       include: {
         seen: true,

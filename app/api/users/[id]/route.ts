@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import prisma from "../../../libs/prismadb"
 
 interface IParams {
   id: string;

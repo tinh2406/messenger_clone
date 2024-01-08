@@ -1,6 +1,6 @@
-import getCurrentUser from "@/app/actions/getCurrentUser";
 import { NextResponse } from "next/server";
-// import prisma from "../../../libs/prismadb";
+import prisma from "../../../libs/prismadb";
+import getSession from "@/app/actions/getSession";
 interface IParams {
   conversationId?: string;
 }
@@ -8,17 +8,21 @@ interface IParams {
 export async function DELETE(req: Request, { params }: { params: IParams }) {
   try {
     const { conversationId } = params;
-    const currentUser = await getCurrentUser();
+    const session = await getSession();
 
-    if (!currentUser?.id) {
+    if (!session?.user?.id) {
       return new NextResponse("Unauthorized", { status: 401 });
     }
     const existingConversation = await prisma?.conversation.findUnique({
       where: {
         id: conversationId,
         userIds: {
-          hasSome: [currentUser.id],
+          hasSome: [session.user.id],
         },
+      },
+      cacheStrategy: {
+        swr: 60,
+        ttl: 60,
       },
     });
     if (!existingConversation) {
@@ -28,7 +32,7 @@ export async function DELETE(req: Request, { params }: { params: IParams }) {
       where: {
         id: conversationId,
         userIds: {
-          hasSome: [currentUser.id],
+          hasSome: [session.user.id],
         },
       },
     });

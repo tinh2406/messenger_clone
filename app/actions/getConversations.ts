@@ -1,4 +1,3 @@
-import { Conversation } from "@prisma/client";
 import prisma from "../libs/prismadb";
 import getSession from "./getSession";
 import { ConversationType } from "../types";
@@ -32,6 +31,10 @@ export default async (): Promise<ConversationsResponse> => {
           lastMessageAt: null,
         },
       },
+      cacheStrategy: {
+        swr: 60,
+        ttl: 60,
+      },
     });
     const conversations = await prisma?.conversation.findMany({
       orderBy: {
@@ -54,6 +57,10 @@ export default async (): Promise<ConversationsResponse> => {
             seen: true,
           },
         },
+      },
+      cacheStrategy: {
+        swr: 60,
+        ttl: 60,
       },
     });
     return {

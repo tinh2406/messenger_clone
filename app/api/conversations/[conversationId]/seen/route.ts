@@ -1,6 +1,6 @@
-import getCurrentUser from "@/app/actions/getCurrentUser";
 import { NextResponse } from "next/server";
-// import prisma from "../../../../libs/prismadb"
+import prisma from "../../../../libs/prismadb";
+import getSession from "@/app/actions/getSession";
 interface IParams {
   conversationId: string;
 }
@@ -8,9 +8,9 @@ interface IParams {
 export async function POST(req: Request, { params }: { params: IParams }) {
   try {
     const { conversationId } = params;
-    const currentUser = await getCurrentUser();
+    const session = await getSession();
 
-    if (!currentUser?.id) {
+    if (!session?.user?.id) {
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
@@ -18,11 +18,15 @@ export async function POST(req: Request, { params }: { params: IParams }) {
       where: {
         id: conversationId,
         userIds: {
-          hasSome: [currentUser.id],
+          hasSome: [session.user.id],
         },
       },
       include: {
         lastMessage: true,
+      },
+      cacheStrategy: {
+        swr: 60,
+        ttl: 60,
       },
     });
     if (!conversation) {
@@ -31,7 +35,7 @@ export async function POST(req: Request, { params }: { params: IParams }) {
     if (!conversation.lastMessageId) {
       return NextResponse.json(conversation);
     }
-    if (conversation.lastMessage?.seenIds.includes(currentUser.id))
+    if (conversation.lastMessage?.seenIds.includes(session.user.id))
       return NextResponse.json(conversation);
 
     const updatedMessage = await prisma?.message.update({
@@ -40,7 +44,7 @@ export async function POST(req: Request, { params }: { params: IParams }) {
       },
       data: {
         seenIds: {
-          push: currentUser.id,
+          push: session.user.id,
         },
       },
     });
