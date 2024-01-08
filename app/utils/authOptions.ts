@@ -6,7 +6,7 @@ import bcrypt from "bcryptjs";
 import { MySession } from "@/app/types";
 import { PrismaClient } from "@prisma/client";
 
-const prisma = new PrismaClient()
+const prisma = new PrismaClient();
 
 export const authOptions: AuthOptions = {
   adapter: PrismaAdapter(prisma),
@@ -18,27 +18,31 @@ export const authOptions: AuthOptions = {
         password: { label: "password", type: "password" },
       },
       async authorize(credentials) {
-        console.log("User:::credentials",credentials);
+        console.log("User:::credentials", credentials);
         if (!credentials?.email || !credentials?.password) {
           throw new Error("Invalid credentials");
         }
+        try {
+          const user = await prisma.user.findUnique({
+            where: {
+              email: credentials.email,
+            },
+          });
+          console.log("User:::", user);
+          if (!user || !user?.hashedPassword) {
+            throw new Error("Invalid credentials");
+          }
+          const isCorrectPassword = await bcrypt.compare(
+            credentials.password,
+            user.hashedPassword
+          );
+          if (!isCorrectPassword) throw new Error("Invalid credentials");
 
-        const user = await prisma.user.findUnique({
-          where: {
-            email: credentials.email,
-          },
-        });
-        console.log("User:::",user);
-        if (!user || !user?.hashedPassword) {
-          throw new Error("Invalid credentials");
+          return user;
+        } catch (error) {
+          console.log("Error::", error);
+          return null;
         }
-        const isCorrectPassword = await bcrypt.compare(
-          credentials.password,
-          user.hashedPassword
-        );
-        if (!isCorrectPassword) throw new Error("Invalid credentials");
-
-        return user;
       },
     }),
   ],
