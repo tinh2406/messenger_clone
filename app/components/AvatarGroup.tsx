@@ -31,7 +31,7 @@ export default ({ users }: AvatarGroupProps) => {
             alt="AvtGroup"
             src={
               user.image ||
-              "https://github.com/tinh2406/messenger-clone-nextjs13/blob/main/public/images/logo.png?raw=true"
+              "/logo.png"
             }
             fill
           />

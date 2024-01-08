@@ -6,7 +6,7 @@ import useOtherUser from "@/app/hooks/useOtherUser";
 import { ConversationType } from "@/app/types";
 import clsx from "clsx";
 import { format } from "date-fns";
-import { useMemo } from "react";
+import { memo, useMemo } from "react";
 import Link from "next/link";
 import useConversation from "@/app/hooks/useConversation";
 
@@ -15,7 +15,7 @@ interface ConversationBoxProps {
   userEmail: string;
 }
 
-export default ({ data, userEmail }: ConversationBoxProps) => {
+export default memo(({ data, userEmail }: ConversationBoxProps) => {
   const otherUser = useOtherUser(data, userEmail);
   const { conversationId } = useConversation();
 
@@ -52,6 +52,7 @@ export default ({ data, userEmail }: ConversationBoxProps) => {
           items-center
           space-x-3
           p-3
+          px-6
           hover:bg-neutral-300
           rounded-lg
           transition
@@ -88,4 +89,4 @@ export default ({ data, userEmail }: ConversationBoxProps) => {
       </div>
     </Link>
   );
-};
+});

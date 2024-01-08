@@ -87,7 +87,7 @@ export default memo(({ isOpen, onClose, user }: SettingModalProps) => {
                     src={
                       image ||
                       user.image ||
-                      "https://github.com/tinh2406/messenger-clone-nextjs13/blob/main/public/images/logo.png?raw=true"
+                      "/logo.png"
                     }
                     alt="Avatar"
                   />

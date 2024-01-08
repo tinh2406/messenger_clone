@@ -1,14 +1,12 @@
 import getConversations from "@/app/actions/getConversations";
-import ConversationBox from "./ConversationBox";
 import getSession from "@/app/actions/getSession";
+import ConversationListClient from "../Client/ConversationListClient";
 
 export default async () => {
-  const conversations = await getConversations();
+  const data = await getConversations();
   const session = await getSession();
 
   const userEmail = session?.user?.email;
   
-  return conversations.map((item) => (
-    <ConversationBox key={item.id} data={item} userEmail={userEmail!} />
-  ));
+  return <ConversationListClient userEmail={userEmail!} initData={data} />
 };

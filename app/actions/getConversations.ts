@@ -1,17 +1,43 @@
+import { Conversation } from "@prisma/client";
 import prisma from "../libs/prismadb";
 import getSession from "./getSession";
-export default async () => {
+import { ConversationType } from "../types";
+
+type ConversationsResponse = {
+  data: ConversationType[];
+  meta: {
+    total: number;
+  };
+};
+
+export default async (): Promise<ConversationsResponse> => {
   const session = await getSession();
 
   if (!session?.user?.id) {
-    return [];
+    return {
+      data: [],
+      meta: {
+        total: 0,
+      },
+    };
   }
 
   try {
+    const count = await prisma?.conversation.count({
+      where: {
+        userIds: {
+          has: session.user.id,
+        },
+        NOT: {
+          lastMessageAt: null,
+        },
+      },
+    });
     const conversations = await prisma?.conversation.findMany({
       orderBy: {
         lastMessageAt: "desc",
       },
+      take: 10,
       where: {
         userIds: {
           has: session.user.id,
@@ -30,8 +56,18 @@ export default async () => {
         },
       },
     });
-    return conversations;
+    return {
+      data: conversations,
+      meta: {
+        total: count,
+      },
+    };
   } catch (error) {
-    return [];
+    return {
+      data: [],
+      meta: {
+        total: 0,
+      },
+    };
   }
 };

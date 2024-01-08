@@ -1,8 +1,8 @@
 import clsx from "clsx";
-import ConversationList from "./components/ConversationList";
+import ConversationList from "./components/Server/ConversationListServer";
 import { Suspense } from "react";
 import { MdOutlineGroupAdd } from "react-icons/md";
-import GroupChatModal from "./components/GroupChatWrapper";
+import GroupChatModal from "./components/Server/GroupChatServer";
 import Loading from "@/app/components/Loading";
 
 export default ({ children }: { children: React.ReactNode }) => {
@@ -14,11 +14,11 @@ export default ({ children }: { children: React.ReactNode }) => {
           bg-white            
             fixed
             inset-y-0
-            pb-14
-            lg:pb-0
+            h-[calc(100%-3.5rem)]
+            lg:h-full
             lg:left-20
             w-full
-            md:w-80
+            md:w-[22rem]
             block
             overflow-y-auto
             border-r
@@ -26,8 +26,7 @@ export default ({ children }: { children: React.ReactNode }) => {
             `
         )}
       >
-        <div className="px-5">
-          <div className="flex justify-between mb-[12px] pt-4">
+          <div className="px-5 flex justify-between pt-4 pb-[12px] h-16 border-b-[1px] shadow-sm">
             <div className="text-2xl font-bold text-neutral-800">Message</div>
             <Suspense
               fallback={
@@ -48,10 +47,9 @@ export default ({ children }: { children: React.ReactNode }) => {
               <GroupChatModal />
             </Suspense>
           </div>
-          <Suspense fallback={<Loading />}>
+          <Suspense fallback={<div><Loading /></div>}>
             <ConversationList />
           </Suspense>
-        </div>
       </aside>
       {children}
     </div>

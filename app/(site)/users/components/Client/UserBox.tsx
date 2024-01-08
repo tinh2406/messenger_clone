@@ -4,13 +4,13 @@ import Avatar from "@/app/components/Avatar";
 import { User } from "@prisma/client";
 import axios from "axios";
 import { useRouter } from "next/navigation";
-import { useCallback, useState } from "react";
+import { memo, useCallback, useState } from "react";
 
 interface UserBoxProps {
   data: User & { conversationId?: string };
 }
 
-export default ({ data }: UserBoxProps) => {
+export default memo(({ data }: UserBoxProps) => {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
 
@@ -40,6 +40,7 @@ export default ({ data }: UserBoxProps) => {
             space-x-3
             bg-white 
             p-3 
+            px-6
             hover:bg-neutral-100 
             rounded-lg 
             transition 
@@ -55,4 +56,4 @@ export default ({ data }: UserBoxProps) => {
       </div>
     </div>
   );
-};
+});

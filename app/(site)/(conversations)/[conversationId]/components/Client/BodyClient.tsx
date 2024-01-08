@@ -10,13 +10,20 @@ import MessageBox from "./MessageBox";
 import CircleLoading from "@/app/components/CircleLoading";
 import { useAuth } from "@/app/context/AuthContext";
 
+type MessageResponse = {
+  data: FullMessageType[];
+  meta: {
+    total: number;
+  };
+};
+
 interface BodyProps {
-  initialMessages: FullMessageType[];
+  initData: MessageResponse;
 }
 
-export default ({ initialMessages }: BodyProps) => {
-  const session = useAuth()
-  const [messages, setMessages] = useState(initialMessages);
+export default ({ initData }: BodyProps) => {
+  const session = useAuth();
+  const [messages, setMessages] = useState(initData.data || []);
   const bottomRef = useRef<HTMLDivElement>(null);
   const { conversationId } = useConversation();
   useEffect(() => {
