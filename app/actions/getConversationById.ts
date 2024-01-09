@@ -13,7 +13,7 @@ export default async (conversationId: string, session: MySession) => {
       },
     });
     if (conversation?.userIds.includes(session.user.id)) return conversation;
-  } catch (error) {
+  } catch (error) {    
     return null;
   }
 };

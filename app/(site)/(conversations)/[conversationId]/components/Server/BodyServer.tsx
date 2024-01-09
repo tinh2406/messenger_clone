@@ -2,7 +2,6 @@ import getMessages from "@/app/actions/getMessages";
 import BodyClient from "../Client/BodyClient";
 import Form from "../Client/Form";
 import EmptyState from "@/app/(site)/components/EmptyState";
-import clsx from "clsx";
 
 interface BodyServerProps {
   conversationId: string;
@@ -21,7 +20,7 @@ export default async ({ conversationId }: BodyServerProps) => {
     );
   } catch (error) {
     return (
-      <div className={clsx("h-full block")}>
+      <div className="h-full block">
         <EmptyState />
       </div>
     );
