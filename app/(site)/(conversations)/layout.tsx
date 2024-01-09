@@ -1,11 +1,17 @@
 import clsx from "clsx";
-import ConversationList from "./components/Server/ConversationListServer";
-import { Suspense } from "react";
-import { MdOutlineGroupAdd } from "react-icons/md";
-import GroupChatModal from "./components/Server/GroupChatServer";
-import Loading from "@/app/components/Loading";
+import getConversations from "@/app/actions/getConversations";
+import ConversationListClient from "./components/ConversationListClient";
+import GroupChatModal from "./components/GroupChatModal";
+import getUsers from "@/app/actions/getUsers";
+import getSession from "@/app/actions/getSession";
 
-export default ({ children }: { children: React.ReactNode }) => {
+export default async ({ children }: { children: React.ReactNode }) => {
+  const conversations = await getConversations();
+  const session = await getSession();
+  const users = await getUsers();
+
+  const userEmail = session?.user?.email;
+
   return (
     <div className="h-full">
       <aside
@@ -26,30 +32,15 @@ export default ({ children }: { children: React.ReactNode }) => {
             `
         )}
       >
-          <div className="px-5 flex justify-between pt-4 pb-[12px] h-16 border-b-[1px] shadow-sm">
-            <div className="text-2xl font-bold text-neutral-800">Message</div>
-            {/* <Suspense
-              fallback={
-                <div
-                  className="
-                  rounded-full
-                  p-2
-                  bg-gray-100 
-                  text-gray-600 
-                  cursor-pointer 
-                  hover:opacity-75 
-                  transition"
-                >
-                  <MdOutlineGroupAdd size={20} />
-                </div>
-              }
-            > */}
-              <GroupChatModal />
-            {/* </Suspense> */}
-          </div>
-          {/* <Suspense fallback={<div><Loading /></div>}> */}
-            <ConversationList />
-          {/* </Suspense> */}
+        <div className="px-5 flex justify-between pt-4 pb-[12px] h-16 border-b-[1px] shadow-sm">
+          <div className="text-2xl font-bold text-neutral-800">Message</div>
+
+          <GroupChatModal users={users.data} />
+        </div>
+        <ConversationListClient
+          userEmail={userEmail!}
+          initData={conversations}
+        />
       </aside>
       {children}
     </div>

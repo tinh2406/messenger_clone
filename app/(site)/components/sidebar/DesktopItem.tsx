@@ -1,20 +1,21 @@
 "use client";
 
+import useLoading from "@/app/hooks/useLoading";
 import clsx from "clsx";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { memo, useMemo } from "react";
+import { usePathname, useRouter } from "next/navigation";
+import { memo, useEffect, useMemo } from "react";
 
 interface DesktopItemProps {
   label: string;
   icon?: any;
   href: string;
-  onClick?: () => void;
 }
 
-export default memo(({ label, icon, href, onClick }: DesktopItemProps) => {
+export default memo(({ label, icon, href }: DesktopItemProps) => {
   const pathName = usePathname();
-
+  const { setIsLoading } = useLoading();
+  const router = useRouter();
   const active = useMemo(() => {
     if (pathName === "/users")
       if (href === "/users") return true;
@@ -22,9 +23,16 @@ export default memo(({ label, icon, href, onClick }: DesktopItemProps) => {
 
     return href === "/";
   }, [pathName]);
-
+  useEffect(() => {
+    setIsLoading(false);
+  }, [active]);
   return (
-    <li onClick={onClick}>
+    <li
+      onClick={() => {
+        setIsLoading(true);
+        router.push(href);
+      }}
+    >
       <Link
         href={href}
         className={clsx(

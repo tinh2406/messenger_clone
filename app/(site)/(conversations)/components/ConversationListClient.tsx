@@ -22,6 +22,7 @@ interface ConversationListClientProps {
 }
 
 export default ({ initData, userEmail }: ConversationListClientProps) => {
+
   const { data, fetchNextPage, isFetchingNextPage } = useInfiniteQuery(
     ["conversations"],
     async ({ pageParam }) => {
@@ -44,7 +45,7 @@ export default ({ initData, userEmail }: ConversationListClientProps) => {
       },
     }
   );
-
+    
   const endRef = useRef<HTMLDivElement>(null);
   useOnScreen(
     endRef,

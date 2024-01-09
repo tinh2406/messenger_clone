@@ -1,9 +1,10 @@
 "use client";
 
+import useLoading from "@/app/hooks/useLoading";
 import clsx from "clsx";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { memo, useMemo } from "react";
+import { usePathname, useRouter } from "next/navigation";
+import { memo, useEffect, useMemo } from "react";
 
 interface MobileItemProps {
   href: string;
@@ -11,6 +12,8 @@ interface MobileItemProps {
 }
 export default memo(({ href, icon }: MobileItemProps) => {
   const pathName = usePathname();
+  const { setIsLoading } = useLoading();
+  const router = useRouter();
   const active = useMemo(() => {
     if (pathName === "/users")
       if (href === "/users") return true;
@@ -18,7 +21,9 @@ export default memo(({ href, icon }: MobileItemProps) => {
 
     return href === "/";
   }, [pathName]);
-
+  useEffect(() => {
+    setIsLoading(false);
+  }, [active]);
   return (
     <Link
       href={href}
@@ -36,6 +41,10 @@ export default memo(({ href, icon }: MobileItemProps) => {
         `,
         active ? "bg-gray-100 text-black" : "text-gray-500"
       )}
+      onClick={() => {
+        setIsLoading(true);
+        router.push(href);
+      }}
     >
       {icon}
     </Link>

@@ -18,7 +18,6 @@ interface ConversationBoxProps {
 export default memo(({ data, userEmail }: ConversationBoxProps) => {
   const otherUser = useOtherUser(data, userEmail);
   const { conversationId } = useConversation();
-
   const hasSeen = useMemo(() => {
     if (!data.lastMessage) {
       return false;
@@ -27,8 +26,7 @@ export default memo(({ data, userEmail }: ConversationBoxProps) => {
     if (!userEmail) {
       return false;
     }
-
-    return seenArray.filter((user) => user.email === userEmail).length !== 0;
+    return seenArray.findIndex((user) => user.email === userEmail) !== -1;
   }, [data.lastMessage, userEmail]);
 
   const lastMessageText = useMemo(() => {

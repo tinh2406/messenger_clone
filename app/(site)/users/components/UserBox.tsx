@@ -1,10 +1,11 @@
 "use client";
 
 import Avatar from "@/app/components/Avatar";
+import useLoading from "@/app/hooks/useLoading";
 import { User } from "@prisma/client";
 import axios from "axios";
 import { useRouter } from "next/navigation";
-import { memo, useCallback, useState } from "react";
+import { memo, useCallback } from "react";
 
 interface UserBoxProps {
   data: User & { conversationId?: string };
@@ -12,7 +13,7 @@ interface UserBoxProps {
 
 export default memo(({ data }: UserBoxProps) => {
   const router = useRouter();
-  const [isLoading, setIsLoading] = useState(false);
+  const { setIsLoading } = useLoading();
 
   const handleClick = useCallback(async () => {
     if (data.conversationId) {
@@ -26,7 +27,6 @@ export default memo(({ data }: UserBoxProps) => {
       });
       router.push(`/${res.data.id}`);
     } catch (error) {}
-    setIsLoading(false);
   }, [data, router]);
 
   return (
