@@ -16,11 +16,11 @@ export default memo(({ data }: UserBoxProps) => {
   const { setIsLoading } = useLoading();
 
   const handleClick = useCallback(async () => {
+    setIsLoading(true);
     if (data.conversationId) {
       router.push(`/${data.conversationId}`);
       return;
     }
-    setIsLoading(true);
     try {
       const res = await axios.post("/api/conversations", {
         userId: data.id,
