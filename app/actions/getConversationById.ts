@@ -11,10 +11,6 @@ export default async (conversationId: string, session: MySession) => {
       include: {
         users: true,
       },
-      cacheStrategy: {
-        swr: 60,
-        ttl: 60,
-      },
     });
     if (conversation?.userIds.includes(session.user.id)) return conversation;
   } catch (error) {

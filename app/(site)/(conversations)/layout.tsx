@@ -11,6 +11,7 @@ export default async ({ children }: { children: React.ReactNode }) => {
   const users = await getUsers();
 
   const userEmail = session?.user?.email;
+  const userId = session?.user?.id;
 
   return (
     <div className="h-full">
@@ -40,6 +41,7 @@ export default async ({ children }: { children: React.ReactNode }) => {
         <ConversationListClient
           userEmail={userEmail!}
           initData={conversations}
+          userId={userId!}
         />
       </aside>
       {children}

@@ -24,10 +24,6 @@ export async function POST(req: Request, { params }: { params: IParams }) {
       include: {
         lastMessage: true,
       },
-      cacheStrategy: {
-        swr: 60,
-        ttl: 60,
-      },
     });
     if (!conversation) {
       return new NextResponse("Conversation not found", { status: 404 });

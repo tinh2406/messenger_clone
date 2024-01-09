@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import prisma from "../../libs/prismadb";
 import getSession from "@/app/actions/getSession";
+import { pusherServer } from "@/app/libs/pusher";
 
 export async function POST(req: Request) {
   try {
@@ -17,10 +18,6 @@ export async function POST(req: Request) {
         senderId: session.user.id,
         seenIds: [session.user.id],
       },
-      include: {
-        seen: true,
-        sender: true,
-      },
     });
     const updatedConversation = await prisma?.conversation.update({
       where: { id: conversationId },
@@ -28,15 +25,11 @@ export async function POST(req: Request) {
         lastMessageAt: new Date(),
         lastMessageId: newMessage?.id,
       },
-      include: {
-        users: true,
-        messages: {
-          include: {
-            seen: true,
-          },
-        },
-      },
     });
+    updatedConversation.userIds.forEach(userId=>{
+      pusherServer.trigger(userId, "conversation", "update");
+      pusherServer.trigger(userId, "message", "add");
+    })
     return NextResponse.json(newMessage);
   } catch (error) {
     return new NextResponse("Internal server error: ", { status: 500 });

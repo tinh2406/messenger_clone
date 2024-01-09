@@ -44,7 +44,8 @@ export default memo(({ user }: AvatarProps) => {
           sizes="36px"
         />
       </div>
-      <SettingModal user={user} isOpen={isOpenModal} onClose={onClose} />
+      {user&&
+      <SettingModal user={user} isOpen={isOpenModal} onClose={onClose} />}
     </>
   );
 });

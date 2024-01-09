@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import prisma from "../../../libs/prismadb";
 import getSession from "@/app/actions/getSession";
+import { pusherServer } from "@/app/libs/pusher";
 interface IParams {
   conversationId?: string;
 }
@@ -20,10 +21,6 @@ export async function DELETE(req: Request, { params }: { params: IParams }) {
           hasSome: [session.user.id],
         },
       },
-      cacheStrategy: {
-        swr: 60,
-        ttl: 60,
-      },
     });
     if (!existingConversation) {
       return new NextResponse("Conversation not found", { status: 404 });
@@ -36,6 +33,10 @@ export async function DELETE(req: Request, { params }: { params: IParams }) {
         },
       },
     });
+    existingConversation.userIds.forEach(userId => {
+      pusherServer.trigger(userId, "conversation", "delete");
+    })
+    
     return NextResponse.json(deletedConversation);
   } catch (error) {
     return new NextResponse("Internal Server Error", { status: 500 });

@@ -14,10 +14,6 @@ export default async (conversationId: string): Promise<MessageResponse> => {
       where: {
         conversationId,
       },
-      cacheStrategy: {
-        swr: 60,
-        ttl: 60,
-      },
     });
     const messages = await prisma.message.findMany({
       where: {
@@ -31,10 +27,6 @@ export default async (conversationId: string): Promise<MessageResponse> => {
         createdAt: "asc",
       },
       take: 6,
-      cacheStrategy: {
-        swr: 60,
-        ttl: 60,
-      },
     });
     return {
       data: messages,

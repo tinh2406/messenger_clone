@@ -3,12 +3,14 @@
 import Button from "@/app/components/Button";
 import Modal from "@/app/components/Modal";
 import useConversation from "@/app/hooks/useConversation";
+import useLoading from "@/app/hooks/useLoading";
 import { Dialog } from "@headlessui/react";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import { useCallback, useState } from "react";
 import { toast } from "react-hot-toast";
 import { FiAlertTriangle } from "react-icons/fi";
+import { useQueryClient } from "react-query";
 interface ConfirmModalProps {
   isOpen?: boolean;
   onClose: () => void;
@@ -17,12 +19,13 @@ interface ConfirmModalProps {
 export default ({ isOpen, onClose }: ConfirmModalProps) => {
   const router = useRouter();
   const { conversationId } = useConversation();
-  const [isLoading, setIsLoading] = useState(false);
-
+  const {isLoading, setIsLoading} = useLoading();
+  const queryClient = useQueryClient()
   const onDelete = useCallback(async () => {
     setIsLoading(true);
     try {
       await axios.delete(`/api/conversations/${conversationId}`);
+      queryClient.invalidateQueries(["conversations"]);
       onClose();
       router.push("/");
     } catch (error) {

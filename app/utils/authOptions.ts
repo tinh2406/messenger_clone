@@ -26,10 +26,6 @@ export const authOptions: AuthOptions = {
             where: {
               email: credentials.email,
             },
-            cacheStrategy: {
-              swr: 60,
-              ttl: 60,
-            },
           });
           if (!user || !user?.hashedPassword) {
             throw new Error("Invalid credentials");

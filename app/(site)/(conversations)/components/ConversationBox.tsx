@@ -69,9 +69,9 @@ export default memo(({ data, userEmail }: ConversationBoxProps) => {
             <p className="text-md font-semibold text-gray-900">
               {data.name || otherUser?.name || ""}
             </p>
-            {data.lastMessage?.createdAt && (
+            {data.lastMessageAt && (
               <p className="text-xs text-gray-400 font-light">
-                {format(new Date(data.lastMessage.createdAt), "p")}
+                {format(new Date(data.lastMessageAt), "p")}
               </p>
             )}
           </div>

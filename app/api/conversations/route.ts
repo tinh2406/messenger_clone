@@ -2,6 +2,7 @@ import getSession from "@/app/actions/getSession";
 import { NextResponse } from "next/server";
 import { parse } from "url";
 import prisma from "../../libs/prismadb";
+import { pusherServer } from "@/app/libs/pusher";
 
 export async function POST(req: Request) {
   try {
@@ -22,14 +23,15 @@ export async function POST(req: Request) {
           isGroup,
           lastMessageAt: new Date(),
           userIds: [
-            ...members.map((member: { value: string }) => ({
-              id: member.value,
-            })),
-            {
-              id: session.user.id,
-            },
+            ...members.map(({value}:{value:string})=>(
+              value
+            )),
+            session.user.id,
           ],
         },
+      });
+      members.map(({value}:{value:string}) => {
+        pusherServer.trigger(value, "conversation", "add");
       });
       return NextResponse.json(newConversation);
     }
@@ -47,10 +49,6 @@ export async function POST(req: Request) {
             },
           },
         ],
-      },
-      cacheStrategy: {
-        swr: 60,
-        ttl: 60,
       },
     });
     if (existingConversation) {
@@ -92,10 +90,6 @@ export async function GET(req: Request) {
             lastMessageAt: null,
           },
         },
-        cacheStrategy: {
-          swr: 60,
-          ttl: 60,
-        },
       })) || 1) - 1;
     const conversations = await prisma?.conversation.findMany({
       orderBy: {
@@ -119,10 +113,6 @@ export async function GET(req: Request) {
             seen: true,
           },
         },
-      },
-      cacheStrategy: {
-        swr: 60,
-        ttl: 60,
       },
     });
     return NextResponse.json({

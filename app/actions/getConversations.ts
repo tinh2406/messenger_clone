@@ -33,10 +33,6 @@ export default async (): Promise<ConversationsResponse> => {
           lastMessageAt: null,
         },
       },
-      cacheStrategy: {
-        swr: 60,
-        ttl: 60,
-      },
     });
     const conversations = await prisma?.conversation.findMany({
       orderBy: {
@@ -60,10 +56,6 @@ export default async (): Promise<ConversationsResponse> => {
           },
         },
       },
-      cacheStrategy: {
-        swr: 60,
-        ttl: 60,
-      },
     });
     return {
       data: conversations,
@@ -73,6 +65,8 @@ export default async (): Promise<ConversationsResponse> => {
       },
     };
   } catch (error) {
+    console.log(error);
+    
     return {
       data: [],
       meta: {
