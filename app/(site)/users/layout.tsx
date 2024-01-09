@@ -39,15 +39,15 @@ export default ({ children }: { children: React.ReactNode }) => {
         >
           People
         </div>
-        <Suspense
+        {/* <Suspense
           fallback={
             <div>
               <Loading />
             </div>
           }
-        >
+        > */}
           <UserList />
-        </Suspense>
+        {/* </Suspense> */}
       </aside>
       {children}
     </div>

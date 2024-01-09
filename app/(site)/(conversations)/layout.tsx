@@ -28,7 +28,7 @@ export default ({ children }: { children: React.ReactNode }) => {
       >
           <div className="px-5 flex justify-between pt-4 pb-[12px] h-16 border-b-[1px] shadow-sm">
             <div className="text-2xl font-bold text-neutral-800">Message</div>
-            <Suspense
+            {/* <Suspense
               fallback={
                 <div
                   className="
@@ -43,13 +43,13 @@ export default ({ children }: { children: React.ReactNode }) => {
                   <MdOutlineGroupAdd size={20} />
                 </div>
               }
-            >
+            > */}
               <GroupChatModal />
-            </Suspense>
+            {/* </Suspense> */}
           </div>
-          <Suspense fallback={<div><Loading /></div>}>
+          {/* <Suspense fallback={<div><Loading /></div>}> */}
             <ConversationList />
-          </Suspense>
+          {/* </Suspense> */}
       </aside>
       {children}
     </div>

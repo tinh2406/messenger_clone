@@ -6,6 +6,7 @@ type UsersResponse = {
   data: User[];
   meta: {
     total: number;
+    current: number;
   };
 };
 
@@ -17,11 +18,12 @@ export default async (): Promise<UsersResponse> => {
       data: [],
       meta: {
         total: 0,
+        current: 0,
       },
     };
   }
   try {
-    const total = (await prisma?.user.count()||1)-1;
+    const total = ((await prisma?.user.count()) || 1) - 1;
     const users = await prisma?.user.findMany({
       where: {
         NOT: {
@@ -29,10 +31,10 @@ export default async (): Promise<UsersResponse> => {
         },
       },
       take: 10,
-      cacheStrategy:{
-        swr:60,
-        ttl:60,
-      }
+      cacheStrategy: {
+        swr: 60,
+        ttl: 60,
+      },
     });
     return {
       data: await Promise.all(
@@ -52,10 +54,10 @@ export default async (): Promise<UsersResponse> => {
                 },
               ],
             },
-            cacheStrategy:{
-              swr:60,
-              ttl:60,
-            }
+            cacheStrategy: {
+              swr: 60,
+              ttl: 60,
+            },
           });
           return {
             ...user,
@@ -65,6 +67,7 @@ export default async (): Promise<UsersResponse> => {
       ),
       meta: {
         total,
+        current: users.length,
       },
     };
 
@@ -74,6 +77,7 @@ export default async (): Promise<UsersResponse> => {
       data: [],
       meta: {
         total: 0,
+        current: 0,
       },
     };
   }

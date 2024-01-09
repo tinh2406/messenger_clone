@@ -129,6 +129,7 @@ export async function GET(req: Request) {
       data: conversations,
       meta: {
         total: count,
+        current: Number(query.skip || 0) + conversations.length,
       },
     });
   } catch (error) {

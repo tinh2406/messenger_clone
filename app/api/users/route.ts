@@ -31,6 +31,7 @@ export async function GET(req: Request) {
         data: [],
         meta: {
           total: 0,
+          current:0
         },
       });
 
@@ -61,6 +62,7 @@ export async function GET(req: Request) {
       ),
       meta: {
         total,
+        current: Number(query.skip || 0) + users.length,
       },
     });
   } catch (error) {

@@ -3,7 +3,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import AuthContext from "./context/AuthContext";
 import ToasterContext from "./context/ToasterContext";
-
+import QueryContext from "./context/QueryContext";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
@@ -21,7 +21,7 @@ export default function RootLayout({
       <body className={inter.className}>
         <AuthContext>
           <ToasterContext />
-          {children}
+          <QueryContext>{children}</QueryContext>
         </AuthContext>
       </body>
     </html>

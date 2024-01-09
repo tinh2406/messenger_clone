@@ -6,6 +6,7 @@ type ConversationsResponse = {
   data: ConversationType[];
   meta: {
     total: number;
+    current: number;
   };
 };
 
@@ -17,6 +18,7 @@ export default async (): Promise<ConversationsResponse> => {
       data: [],
       meta: {
         total: 0,
+        current: 0,
       },
     };
   }
@@ -67,6 +69,7 @@ export default async (): Promise<ConversationsResponse> => {
       data: conversations,
       meta: {
         total: count,
+        current: conversations.length,
       },
     };
   } catch (error) {
@@ -74,6 +77,7 @@ export default async (): Promise<ConversationsResponse> => {
       data: [],
       meta: {
         total: 0,
+        current: 0,
       },
     };
   }

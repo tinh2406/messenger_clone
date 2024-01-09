@@ -1,16 +1,18 @@
 "use client";
 
 import { User } from "@prisma/client";
-import { useRef, useState } from "react";
+import { useRef } from "react";
 import UserBox from "./UserBox";
 import useOnScreen from "@/app/hooks/useOnScreen";
 import axios from "axios";
 import CircleLoading from "@/app/components/CircleLoading";
+import { useInfiniteQuery } from "react-query";
 
 type UsersResponse = {
   data: User[];
   meta: {
     total: number;
+    current: number;
   };
 };
 
@@ -19,39 +21,43 @@ interface UserListClientProps {
 }
 
 export default ({ initData }: UserListClientProps) => {
-  const [users, setUsers] = useState(initData?.data || []);
-  const [total, setTotal] = useState(initData?.meta.total || 0);
-  const [isLoading, setIsLoading] = useState(false);
+  const { data, fetchNextPage, isFetchingNextPage } = useInfiniteQuery(
+    ["users"],
+    async ({ pageParam }) => {
+      const res = await axios.get<UsersResponse>("/api/users", {
+        params: {
+          skip: pageParam || 0,
+        },
+      });
+      return res.data;
+    },
+    {
+      getNextPageParam: (lastPage) => {
+        if (lastPage && lastPage?.meta.current >= lastPage?.meta.total) return;
+        return lastPage?.meta.current;
+      },
+      initialData: {
+        pages: [initData],
+        pageParams: [0],
+      },
+    }
+  );
 
   const endRef = useRef<HTMLDivElement>(null);
   useOnScreen(
     endRef,
-    async () => {
-      if (users.length < total && !isLoading) {
-        setIsLoading(true);
-        try {
-          const res = await axios.get<UsersResponse>("api/users", {
-            params: {
-              skip: users.length,
-            },
-          });
-          setUsers((users) => {
-            return [...users, ...res.data.data];
-          });
-          setTotal(res.data.meta.total);
-        } catch (error) {}
-        setIsLoading(false);
-      }
+    () => {
+      fetchNextPage();
     },
-    [users.length, total, isLoading]
+    []
   );
 
   return (
     <div className="flex-col h-[calc(100%-4rem)] overflow-y-auto px-1">
-      {users.map((user) => (
-        <UserBox key={user.id} data={user} />
-      ))}
-      {isLoading && (
+      {data?.pages.map((users) =>
+        users?.data.map((user) => <UserBox key={user.id} data={user} />)
+      )}
+      {isFetchingNextPage && (
         <div>
           <CircleLoading />
         </div>
