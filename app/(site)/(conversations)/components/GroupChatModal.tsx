@@ -4,14 +4,14 @@ import Button from "@/app/components/Button";
 import Modal from "@/app/components/Modal";
 import Input from "@/app/components/inputs/Input";
 import Select from "@/app/components/inputs/Select";
+import useUsers from "@/app/hooks/useUsers";
 import { User } from "@prisma/client";
 import axios from "axios";
 import { useRouter } from "next/navigation";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
 import { MdOutlineGroupAdd } from "react-icons/md";
-import { useQueryClient } from "react-query";
 
 interface GroupChatModalProps {
   users: User[];
@@ -19,10 +19,12 @@ interface GroupChatModalProps {
 
 export default ({ users }: GroupChatModalProps) => {
   const router = useRouter();
+  const { set } = useUsers();
   const [isLoading, setIsLoading] = useState(false);
   const [groupChatOpen, setGroupChatOpen] = useState(false);
-  const queryClient = useQueryClient();
-
+  useEffect(() => {
+    set(users);
+  }, []);
   const {
     register,
     handleSubmit,
@@ -45,7 +47,6 @@ export default ({ users }: GroupChatModalProps) => {
         ...data,
         isGroup: true,
       });
-      queryClient.invalidateQueries(["conversations"]);
       router.push(`/${res.data.id}`);
       onClose();
     } catch (error) {

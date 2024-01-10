@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import { parse } from "url";
 import prisma from "../../libs/prismadb";
 import { pusherServer } from "@/app/libs/pusher";
+import { Prisma } from "@prisma/client";
 
 export async function POST(req: Request) {
   try {
@@ -23,15 +24,16 @@ export async function POST(req: Request) {
           isGroup,
           lastMessageAt: new Date(),
           userIds: [
-            ...members.map(({value}:{value:string})=>(
-              value
-            )),
+            ...members.map(({ value }: { value: string }) => value),
             session.user.id,
           ],
         },
+        include:{
+          users:true
+        }
       });
-      members.map(({value}:{value:string}) => {
-        pusherServer.trigger(value, "conversation", "add");
+      newConversation.userIds.map((userIds) => {
+        pusherServer.trigger(userIds, "conversation:add", newConversation);
       });
       return NextResponse.json(newConversation);
     }
@@ -67,13 +69,16 @@ export async function POST(req: Request) {
 }
 
 interface GetConversationsQuery {
-  skip?: number;
   take?: number;
+  cursorId?: string;
 }
 
 export async function GET(req: Request) {
   const query: GetConversationsQuery = parse(req.url, true).query;
-
+  const myQuery: {
+    cursor?: Prisma.ConversationWhereUniqueInput | undefined;
+    skip?: number | undefined;
+  } = query.cursorId ? { cursor: { id: query.cursorId }, skip: 1 } : {};
   try {
     const session = await getSession();
 
@@ -96,7 +101,6 @@ export async function GET(req: Request) {
         lastMessageAt: "desc",
       },
       take: Number(query.take || 10),
-      skip: Number(query.skip || 0),
       where: {
         userIds: {
           has: session.user.id,
@@ -114,12 +118,12 @@ export async function GET(req: Request) {
           },
         },
       },
+      ...myQuery,
     });
     return NextResponse.json({
       data: conversations,
       meta: {
         total: count,
-        current: Number(query.skip || 0) + conversations.length,
       },
     });
   } catch (error) {

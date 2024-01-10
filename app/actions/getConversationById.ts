@@ -8,9 +8,6 @@ export default async (conversationId: string, session: MySession) => {
       where: {
         id: conversationId,
       },
-      include: {
-        users: true,
-      },
     });
     if (conversation?.userIds.includes(session.user.id)) return conversation;
   } catch (error) {    

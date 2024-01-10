@@ -25,11 +25,19 @@ export async function POST(req: Request) {
         lastMessageAt: new Date(),
         lastMessageId: newMessage?.id,
       },
+      include: {
+        users: true,
+        lastMessage:{
+          include:{
+            seen:true
+          }
+        }
+      },
     });
-    updatedConversation.userIds.forEach(userId=>{
-      pusherServer.trigger(userId, "conversation", "update");
+    updatedConversation.userIds.forEach((userId) => {
+      pusherServer.trigger(userId, "conversation:update", updatedConversation);
       pusherServer.trigger(userId, "message", "add");
-    })
+    });
     return NextResponse.json(newMessage);
   } catch (error) {
     return new NextResponse("Internal server error: ", { status: 500 });

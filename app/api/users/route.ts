@@ -1,15 +1,19 @@
 import getSession from "@/app/actions/getSession";
 import { NextResponse } from "next/server";
 import { parse } from "url";
-import prisma from "../../libs/prismadb"
+import prisma from "../../libs/prismadb";
+import { Prisma } from "@prisma/client";
 interface GetUsersQuery {
-  skip?: number;
   take?: number;
+  cursorId?: string;
 }
 
 export async function GET(req: Request) {
   const query: GetUsersQuery = parse(req.url, true).query;
-
+  const myQuery: {
+    cursor?: Prisma.UserWhereUniqueInput | undefined;
+    skip?: number | undefined;
+  } = query.cursorId ? { cursor: { id: query.cursorId }, skip: 1 } : {};
   try {
     const session = await getSession();
 
@@ -24,14 +28,14 @@ export async function GET(req: Request) {
         },
       },
       take: Number(query.take || 10),
-      skip: Number(query.skip || 0),
+      ...myQuery,
     });
     if (!users)
       return NextResponse.json({
         data: [],
         meta: {
           total: 0,
-          current:0
+          current: 0,
         },
       });
 
@@ -62,7 +66,6 @@ export async function GET(req: Request) {
       ),
       meta: {
         total,
-        current: Number(query.skip || 0) + users.length,
       },
     });
   } catch (error) {

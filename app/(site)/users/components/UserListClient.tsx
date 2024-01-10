@@ -1,11 +1,11 @@
 "use client";
 
 import { User } from "@prisma/client";
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import UserBox from "./UserBox";
 import useOnScreen from "@/app/hooks/useOnScreen";
 import axios from "axios";
-import { useInfiniteQuery } from "react-query";
+import useUsers from "@/app/hooks/useUsers";
 
 type UsersResponse = {
   data: User[];
@@ -16,47 +16,39 @@ type UsersResponse = {
 };
 
 interface UserListClientProps {
-  initData?: UsersResponse;
+  initData: UsersResponse;
 }
 
 export default ({ initData }: UserListClientProps) => {
-  const { data, fetchNextPage, isFetchingNextPage } = useInfiniteQuery(
-    ["users"],
-    async ({ pageParam }) => {
-      const res = await axios.get<UsersResponse>("/api/users", {
-        params: {
-          skip: pageParam || 0,
-        },
-      });
-      return res.data;
-    },
-    {
-      getNextPageParam: (lastPage) => {
-        if (lastPage && lastPage?.meta.current >= lastPage?.meta.total) return;
-        return lastPage?.meta.current;
-      },
-      initialData: {
-        pages: [initData],
-        pageParams: [0],
-      },
-    }
-  );
+  const [isLoading, setIsLoading] = useState(false);
+  const { users, set, addLast } = useUsers();
+  useEffect(() => {
+    set(initData?.data);
+  }, []);
 
   const endRef = useRef<HTMLDivElement>(null);
   useOnScreen(
     endRef,
-    () => {
-      fetchNextPage();
+    async () => {
+      if (isLoading || users.length >= initData.meta.total) return;
+      setIsLoading(true);
+      const res = await axios.get<UsersResponse>("api/users", {
+        params: {
+          cursorId: users[users.length - 1]?.id,
+        },
+      });
+      addLast(res.data.data);
+      setIsLoading(false);
     },
-    []
+    [users, isLoading]
   );
 
   return (
     <div className="flex-col h-[calc(100%-4rem)] overflow-y-auto px-1">
-      {data?.pages.map((users) =>
-        users?.data.map((user) => <UserBox key={user.id} data={user} />)
-      )}
-      {isFetchingNextPage && (
+      {users?.map((user) => (
+        <UserBox key={user.id} data={user} />
+      ))}
+      {isLoading ? (
         <div
           className={`w-full relative flex items-center space-x-3 p-3 px-6 animate-pulse`}
         >
@@ -65,6 +57,8 @@ export default ({ initData }: UserListClientProps) => {
             <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-400 w-40 mb-2.5"></div>
           </div>
         </div>
+      ) : (
+        <div className="h-14" />
       )}
       <div ref={endRef} />
     </div>

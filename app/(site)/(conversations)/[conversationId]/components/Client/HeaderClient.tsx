@@ -1,33 +1,48 @@
 "use client";
 
-import useOtherUser from "@/app/hooks/useOtherUser";
-import { Conversation, User } from "@prisma/client";
-import Link from "next/link";
-import { useMemo, useState } from "react";
-import { HiChevronLeft, HiEllipsisHorizontal } from "react-icons/hi2";
+import Avatar from "@/app/components/Avatar";
 import AvatarGroup from "@/app/components/AvatarGroup";
 import useActiveList from "@/app/hooks/useActiveList";
-import Avatar from "@/app/components/Avatar";
+import useConversations from "@/app/hooks/useConversations";
+import axios from "axios";
+import Link from "next/link";
+import { useEffect, useState } from "react";
+import { HiChevronLeft, HiEllipsisHorizontal } from "react-icons/hi2";
+import Header from "../Skeleton/Header";
 import ProfileDrawer from "./ProfileDrawer";
+import { useRouter } from "next/navigation";
 
 interface HeaderProps {
-  conversation: Conversation & {
-    users: User[];
-  };
   userEmail: string;
+  id: string;
 }
 
-export default ({ conversation, userEmail }: HeaderProps) => {
-  const otherUser = useOtherUser(conversation, userEmail);
+export default ({ id, userEmail }: HeaderProps) => {
+  const { getById } = useConversations();
+  const router = useRouter()
+  const [conversation, setConversation] = useState(getById(id));
   const [drawerOpen, setDrawerOpen] = useState(false);
   const { members } = useActiveList();
-  const isActive = members.indexOf(otherUser.email!) !== -1;
-  const statusText = useMemo(() => {
-    if (conversation.isGroup) {
-      return `${conversation.users.length} members`;
+  useEffect(() => {
+    if (!conversation) {
+      axios
+        .get(`api/conversations/${id}`)
+        .then((res) => {
+          setConversation(res.data);
+        })
+        .catch((err) => {
+          router.push("/")
+        });
     }
-    return isActive ? "Active" : "Offline";
-  }, [conversation, isActive]);
+  }, []);
+  if (!conversation) return <Header />;
+  const otherUser = conversation?.users.filter((u) => u.email !== userEmail)[0];
+  const isActive = members.indexOf(otherUser.email!) !== -1;
+  const statusText = conversation.isGroup
+    ? `${conversation.users.length} members`
+    : isActive
+    ? "Active"
+    : "Offline";
   return (
     <>
       <ProfileDrawer
