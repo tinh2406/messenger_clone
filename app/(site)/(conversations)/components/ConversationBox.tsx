@@ -12,22 +12,23 @@ import useConversation from "@/app/hooks/useConversation";
 
 interface ConversationBoxProps {
   data: ConversationType;
+  userId: string;
   userEmail: string;
 }
 
-export default memo(({ data, userEmail }: ConversationBoxProps) => {
+export default memo(({ data, userId,userEmail }: ConversationBoxProps) => {
   const otherUser = useOtherUser(data, userEmail);
   const { conversationId } = useConversation();
   const hasSeen = useMemo(() => {
     if (!data.lastMessage) {
       return false;
     }
-    const seenArray = data.lastMessage.seen || [];
-    if (!userEmail) {
+    const seenArray = data.lastMessage.seenIds || [];
+    if (!userId) {
       return false;
     }
-    return seenArray.findIndex((user) => user.email === userEmail) !== -1;
-  }, [data.lastMessage, userEmail]);
+    return seenArray.findIndex((seenId) => seenId === userId) !== -1;
+  }, [data.lastMessage, userId]);
 
   const lastMessageText = useMemo(() => {
     if (data.lastMessage?.image) {

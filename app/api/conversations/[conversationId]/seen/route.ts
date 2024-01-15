@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import prisma from "../../../../libs/prismadb";
 import getSession from "@/app/actions/getSession";
+import { pusherServer } from "@/app/libs/pusher";
 interface IParams {
   conversationId: string;
 }
@@ -44,7 +45,11 @@ export async function POST(req: Request, { params }: { params: IParams }) {
         },
       },
     });
-
+    pusherServer.trigger(conversationId!, "messages:update", updatedMessage);
+    pusherServer.trigger(session.user.email!, "conversation:seen", {
+      id: conversationId,
+      lastMessage: updatedMessage,
+    });
     return NextResponse.json(updatedMessage);
   } catch (error) {
     return new NextResponse("Internal Error", { status: 500 });

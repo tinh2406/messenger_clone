@@ -17,6 +17,7 @@ interface ConversationsStore {
   remove: (conversationId: string) => void;
   set: (conversations: ConversationType[]) => void;
   update: (conversation: ConversationType) => void;
+  seen: (conversation: ConversationType) => void;
   getMore: () => void;
   getById: (id: string) => ConversationType | undefined;
 }
@@ -46,9 +47,22 @@ const useConversations = create<ConversationsStore>((set, get) => ({
       conversations: [
         conversation,
         ...state.conversations.filter(
-          (conver) => conversation.id !== conver.id
+          (conver) =>
+            conversation.id !== conver.id && conver.id !== "conversationId"
         ),
       ],
+    }));
+  },
+  seen(conversation) {
+    set((state) => ({
+      conversations: state.conversations.map((conver) => {
+        if (conversation.id === conver.id)
+          return {
+            ...conver,
+            lastMessage: conversation.lastMessage,
+          };
+        return conver;
+      }),
     }));
   },
   async getMore() {

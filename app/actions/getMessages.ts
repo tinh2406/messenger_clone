@@ -24,12 +24,12 @@ export default async (conversationId: string): Promise<MessageResponse> => {
         seen: true,
       },
       orderBy: {
-        createdAt: "asc",
+        createdAt: "desc",
       },
       take: 6,
     });
     return {
-      data: messages,
+      data: messages.reverse(),
       meta: {
         total: count,
       },

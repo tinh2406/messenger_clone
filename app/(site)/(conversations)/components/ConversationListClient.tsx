@@ -27,7 +27,8 @@ export default ({
   userId,
 }: ConversationListClientProps) => {
   const [isLoading, setIsLoading] = useState(false);
-  const { conversations, set, getMore,add,remove,update } = useConversations();
+  const { conversations, set, getMore, remove, seen, update } =
+    useConversations();
   useEffect(() => {
     set(initData?.data);
   }, []);
@@ -47,22 +48,24 @@ export default ({
   useEffect(() => {
     if (!userId) return;
     pusherClient.subscribe(userId);
-    const addHandler = (data: ConversationType) => {
-      add(data)
-    };
     const updateHandler = (data: ConversationType) => {
-      update(data)
+      update(data);
     };
     const deleteHandler = (data: string) => {
-      remove(data)
+      remove(data);
     };
-    pusherClient.bind("conversation:add", addHandler);
+    const seenHandler = (data: ConversationType) => {
+      seen(data);
+    };
+    pusherClient.bind("conversation:add", updateHandler);
     pusherClient.bind("conversation:update", updateHandler);
+    pusherClient.bind("conversation:seen", seenHandler);
     pusherClient.bind("conversation:delete", deleteHandler);
     return () => {
       pusherClient.unsubscribe(userId);
-      pusherClient.unbind("conversation:add", addHandler);
+      pusherClient.unbind("conversation:add", updateHandler);
       pusherClient.unbind("conversation:update", updateHandler);
+      pusherClient.unbind("conversation:seen", seenHandler);
       pusherClient.unbind("conversation:delete", deleteHandler);
     };
   }, [userId]);
@@ -70,7 +73,7 @@ export default ({
   return (
     <div className="flex-col h-[calc(100%-4rem)] overflow-y-auto px-1">
       {conversations.map((item) => (
-        <ConversationBox key={item.id} data={item} userEmail={userEmail!} />
+        <ConversationBox key={item.id} data={item} userEmail={userEmail!} userId={userId!} />
       ))}
       {isLoading ? (
         <div

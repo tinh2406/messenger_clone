@@ -10,7 +10,7 @@ export async function POST(req: Request) {
     const session = await getSession();
 
     const body = await req.json();
-    const { userId, isGroup, members, name } = body;
+    const { userId, isGroup, members, name,id } = body;
     if (!session?.user?.id || !session.user.email) {
       return new NextResponse("Unauthorized", { status: 401 });
     }
@@ -20,6 +20,7 @@ export async function POST(req: Request) {
     if (isGroup) {
       const newConversation = await prisma?.conversation.create({
         data: {
+          id,
           name,
           isGroup,
           lastMessageAt: new Date(),

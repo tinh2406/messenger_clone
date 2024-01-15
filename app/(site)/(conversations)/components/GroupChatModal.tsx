@@ -4,6 +4,7 @@ import Button from "@/app/components/Button";
 import Modal from "@/app/components/Modal";
 import Input from "@/app/components/inputs/Input";
 import Select from "@/app/components/inputs/Select";
+import useConversations from "@/app/hooks/useConversations";
 import useUsers from "@/app/hooks/useUsers";
 import { User } from "@prisma/client";
 import axios from "axios";
@@ -12,14 +13,18 @@ import { useCallback, useEffect, useState } from "react";
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
 import { MdOutlineGroupAdd } from "react-icons/md";
-
+import { v4 as uuidv4 } from "uuid";
 interface GroupChatModalProps {
   users: User[];
 }
-
+function generateUniqueId() {
+  const uuid = uuidv4(); // Tạo ID với độ dài là 36 kí tự
+  return uuid.replace(/-/g, "").slice(0, 24); // Loại bỏ dấu "-" và giữ lại 24 kí tự đầu tiên
+}
 export default ({ users }: GroupChatModalProps) => {
   const router = useRouter();
   const { set } = useUsers();
+  const { add } = useConversations();
   const [isLoading, setIsLoading] = useState(false);
   const [groupChatOpen, setGroupChatOpen] = useState(false);
   useEffect(() => {
@@ -42,8 +47,21 @@ export default ({ users }: GroupChatModalProps) => {
 
   const onSubmit: SubmitHandler<FieldValues> = async (data) => {
     setIsLoading(true);
+    const id = generateUniqueId();
     try {
+      add({
+        name: data.name,
+        users: members,
+        id:"conversationId",
+        createdAt: new Date(),
+        isGroup: true,
+        lastMessageAt: new Date(),
+        lastMessageId: null,
+        lastMessage: null,
+        userIds: [],
+      });
       const res = await axios.post("/api/conversations", {
+        id,
         ...data,
         isGroup: true,
       });

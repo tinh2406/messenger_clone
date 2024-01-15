@@ -18,6 +18,9 @@ export async function POST(req: Request) {
         senderId: session.user.id,
         seenIds: [session.user.id],
       },
+      include:{
+        sender:true
+      }
     });
     const updatedConversation = await prisma?.conversation.update({
       where: { id: conversationId },
@@ -34,9 +37,9 @@ export async function POST(req: Request) {
         }
       },
     });
+    pusherServer.trigger(conversationId, "messages:new", newMessage);
     updatedConversation.userIds.forEach((userId) => {
       pusherServer.trigger(userId, "conversation:update", updatedConversation);
-      pusherServer.trigger(userId, "message", "add");
     });
     return NextResponse.json(newMessage);
   } catch (error) {
